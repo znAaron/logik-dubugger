@@ -1,0 +1,53 @@
+{
+  "name": "logik-dubugger",
+  "displayName": "Logik Dubugger",
+  "description": "Helping developer to actaully debug Logik :)",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "logik-debugger.startDebug",
+        "title": "Logik Debugger: start debug"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "logik-debugger",
+          "title": "Logik Debugger",
+          "icon": "assets/side_panel/light/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "logik-debugger": [
+        {
+          "type": "webview",
+          "id": "debugSessions",
+          "name": "Config Session"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.99.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "eslint": "^9.23.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
