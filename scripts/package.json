@@ -1,0 +1,15 @@
+{
+  "name": "your-project-name",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "validation_debugger.js",
+  "scripts": {
+    "start": "node validation_debugger",
+    "validate": "node Sessions/26421a5c-f839-4f73-b399-53a9247cfb30/validation_runner.js",
+    "onrequest": "node Sessions/3b91633e-5392-428e-87ca-e42d3b27a8c8/onrequest_runner.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "sync-request": "^6.1.0"
+  }
+}
