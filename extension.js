@@ -117,34 +117,19 @@ class DebugSessionsProvider {
   _getHtmlForWebview(webview) {
     // Get the local path to main script run in the webview, then convert it to a uri we can use in the webview.
     const scriptUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._extensionUri,
-        "assets/side_panel/media",
-        "main.js"
-      )
+      vscode.Uri.joinPath(this._extensionUri, "assets/side_panel", "main.js")
     );
     // Do the same for the stylesheet.
     const styleResetUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._extensionUri,
-        "assets/side_panel/media",
-        "reset.css"
-      )
+      vscode.Uri.joinPath(this._extensionUri, "assets/side_panel", "reset.css")
     );
     const styleVSCodeUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._extensionUri,
-        "assets/side_panel/media",
-        "vscode.css"
-      )
+      vscode.Uri.joinPath(this._extensionUri, "assets/side_panel", "vscode.css")
     );
     const styleMainUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._extensionUri,
-        "assets/side_panel/media",
-        "main.css"
-      )
+      vscode.Uri.joinPath(this._extensionUri, "assets/side_panel", "main.css")
     );
+
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
     return `<!DOCTYPE html>
@@ -168,9 +153,7 @@ class DebugSessionsProvider {
   <title>Cat Colors</title>
 </head>
 <body>
-  <ul class="color-list">
-  </ul>
-
+  <input type="text" id="fileNameInput" placeholder="Enter file name" />
   <button class="debug-btn">Start Debugging</button>
 
   <script nonce="${nonce}" src="${scriptUri}"></script>

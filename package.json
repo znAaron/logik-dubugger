@@ -23,7 +23,7 @@
         {
           "id": "logik-debugger",
           "title": "Logik Debugger",
-          "icon": "assets/side_panel/light/icon.svg"
+          "icon": "assets/icon/icon.svg"
         }
       ]
     },
@@ -32,7 +32,17 @@
         {
           "type": "webview",
           "id": "debugSessions",
-          "name": "Config Session"
+          "name": "Script Debugger"
+        },
+        {
+          "type": "tree",
+          "id": "configView",
+          "name": "Current Config"
+        },
+        {
+          "type": "tree",
+          "id": "debugRules",
+          "name": "Rules"
         }
       ]
     }
