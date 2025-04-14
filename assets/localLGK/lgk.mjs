@@ -1,5 +1,4 @@
-// lgk.mjs
-
+// lgk.js
 const LGK = {
     // Implement the fieldMessage function
     fieldMessage: function(message, level, element) {

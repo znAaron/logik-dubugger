@@ -1,10 +1,9 @@
-// lookup.js
-
-import request from 'sync-request';
-
+// lookup.mjs
+// replace #LOGIK_URL# and #RUNTIME_TOKEN#
 function lookup(query, params = {}) {
-    //console.log("query", query);
-    //console.log("params", params);
+    const sab = new SharedArrayBuffer(4);
+    const int32 = new Int32Array(sab);
+    let result;
 
     // Step 1: Parse the query
     const match = query.match(/select (.+?) from (.+?)(?: where (.+))?$/i);
@@ -17,17 +16,11 @@ function lookup(query, params = {}) {
     const condition = match[3] ? match[3].trim() : null;
 
     // Step 2: Call the API to get the entire table
-    const url = `https://podspoettest.test.logik.io/api/managedTables/v2/managedTables/${tableName}`;
-    //console.log(url);
+    const url = `#LOGIK_URL#/api/managedTables/v2/managedTables/${tableName}`;
+    const token = "#RUNTIME_TOKEN#";
 
-    const response = request('GET', url, {
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Bearer Rg6Dz06s6jYAIzfAedK62bwm0LFEcAKBVw',
-        }
-    });
+    const response = syncRequest(url, token);
 
-    //console.log(response);
     if (response.statusCode !== 200) {
         throw new Error("Failed to fetch data from API");
     }
@@ -43,7 +36,6 @@ function lookup(query, params = {}) {
         return result;
     });
 
-    //console.log(filteredResults)
     // Step 4: Apply conditions if any
     if (condition) {
         const filteredByCondition = filteredResults.filter(row => {
@@ -78,8 +70,47 @@ function lookup(query, params = {}) {
         return filteredByCondition;
     }
 
-    //console.log(filteredResults)
     return filteredResults;
+}
+
+function syncRequest(url, token) {
+    const sab = new SharedArrayBuffer(4);
+    const int32 = new Int32Array(sab);
+    let responseText;
+    let error;
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        }
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(`HTTP error ${res.status}`);
+        }
+        return res.text();
+    })
+    .then(data => {
+        responseText = data;
+    })
+    .catch(err => {
+        error = err;
+    })
+    .finally(() => {
+        Atomics.store(int32, 0, 1); // unblock
+        Atomics.notify(int32, 0);
+    });
+
+    // Block here until Atomics.notify is called
+    Atomics.wait(int32, 0, 0);
+
+    if (error) {
+        throw error;
+    }
+
+    return responseText;
 }
 
 // Export the function

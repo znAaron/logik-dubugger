@@ -16,6 +16,10 @@
       {
         "command": "logik-debugger.startDebug",
         "title": "Logik Debugger: start debug"
+      },
+      {
+        "command": "logik-debugger.configure",
+        "title": "Configure Logik Debugger"
       }
     ],
     "viewsContainers": {
@@ -41,10 +45,31 @@
         },
         {
           "type": "tree",
-          "id": "debugRules",
-          "name": "Rules"
+          "id": "blueprint",
+          "name": "Current Blueprint"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Logik Debugger Configuration",
+      "properties": {
+        "logikDebugger.logikUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Logik URL (https://envionment.test.logik.io/)"
+        },
+        "logikDebugger.runtimeToken": {
+          "type": "string",
+          "default": "",
+          "description": "Logik Runtime Client Token"
+        },
+        "logikDebugger.origin": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "Origin"
+        }
+      }
     }
   },
   "scripts": {
@@ -53,11 +78,16 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.99.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "eslint": "^9.23.0",
+    "@types/vscode": "^1.99.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.23.0"
+  },
+  "dependencies": {
+    "csv-parser": "^3.2.0",
+    "js-yaml": "^4.1.0",
+    "sync-request": "^6.1.0"
   }
 }
