@@ -1,61 +1,6 @@
 import fs from 'fs';
-import fetch from 'node-fetch';
 import path from 'path';
 
-let blueprintName = "quoteConfigurationBlueprint"
-let sessionId = "26421a5c-f839-4f73-b399-53a9247cfb30"
-
-
-// get session data
-async function getDebugProducts(sessionId) {
-    const apiUrl = `https://podspoettest.test.logik.io/api/${sessionId}/bom?size=150`;
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Origin': 'http://localhost:3000',
-                'Authorization': 'Bearer 4zYpPD7OQ3hyRfh5O2-vWSxYcy4gakOB_A',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`Session Invalid!`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching debugProducts:', error);
-        return null;
-    }
-}
-
-async function getConfig(sessionId) {
-    const apiUrl = `https://podspoettest.test.logik.io/api/${sessionId}`;
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Origin': 'http://localhost:3000',
-                'Authorization': 'Bearer 4zYpPD7OQ3hyRfh5O2-vWSxYcy4gakOB_A',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`Session Invalid!`);
-        }
-
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching debugProducts:', error);
-        return null;
-    }
-}
 
 function parseConfig(responseBody) {
     // Initialize an empty object to hold the transformed fields
