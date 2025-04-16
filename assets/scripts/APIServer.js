@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 function startServer(apiCallTreeView) {
     const logikProxy = new LogikProxy();
 
-    // API endpoint to receive calls
+    // API endpoint to receive POST calls
     app.post('/api', (req, res) => {
         const lgkRequest = req.body; // Get the API call data from the request
         //console.log(`Logik Request: ${JSON.stringify(lgkRequest)}`);
@@ -29,6 +29,28 @@ function startServer(apiCallTreeView) {
                     responseBody: result.body
                 });
             apiCallTreeView.refresh(apiCallHistory)
+        });
+    });
+
+    // API endpoint to receive PATCH calls
+    app.patch('/api/:id', (req, res) => {
+        const lgkRequest = req.body; // Get the API call data from the request
+        const id = req.params.id; // Get the ID from the URL
+
+        console.log(lgkRequest);
+        console.log(id);
+
+        // Make an API call to another server
+        logikProxy.updateConfig(id, lgkRequest).then((result) => {
+            res.status(result.status).json(result.body);
+            apiCallHistory.push({
+                method: 'PATCH',
+                time: new Date(),
+                sessionId: id,
+                request: lgkRequest['fields'] || null,
+                responseBody: result.body
+            });
+            apiCallTreeView.refresh(apiCallHistory);
         });
     });
 

@@ -64,12 +64,6 @@ class CallHistoryItem extends vscode.TreeItem {
         this.tooltip = description; // Set tooltip to description
         this.sessionId = sessionId;
 
-        this.command = {
-            command: 'logik-debugger.startDebug', // Replace with your command ID
-            title: 'Debug this call', // Title of the button
-            arguments: sessionId, // Pass the current item as an argument
-        };
-
         this.contextValue = 'callHistoryItem';
         
         this.fields = fields;

@@ -101,7 +101,6 @@
     "eslint": "^9.23.0"
   },
   "dependencies": {
-    "axios": "^1.8.4",
     "body-parser": "^2.2.0",
     "csv-parser": "^3.2.0",
     "express": "^5.1.0",

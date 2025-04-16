@@ -4,6 +4,7 @@ const path = require("path");
 const yaml = require("js-yaml");
 const { exec } = require("child_process");
 
+const { InitDebugger } = require("./debugger/onConfig_debugger.js");
 const { ValidationDebugger } = require("./debugger/validation_debugger.js");
 
 class DebugSessionsProvider {
@@ -61,11 +62,11 @@ class DebugSessionsProvider {
         const selectedFile = this.filenames[selectedType];
 
         // Proceed with debugging using the selectedFile
-        this.handleDebugSession(selectedType, selectedFile, sessionId);
+        this.handleDebugSession(selectedType, selectedFile, sessionId, requestData);
       });
   }
 
-  async handleDebugSession(type, fileName, sessionId) {
+  async handleDebugSession(type, fileName, sessionId, requestData) {
     const selectedFile = fileName;
     if (!selectedFile) {
       vscode.window.showErrorMessage("Unable to find the script");
@@ -119,28 +120,43 @@ class DebugSessionsProvider {
     let sessionDebugger;
     if (type == "VALIDATION") {
       sessionDebugger = new ValidationDebugger(sessionId, debuggerConfig);
+    } else if (type == "INIT") {
+      sessionDebugger = new InitDebugger(sessionId, debuggerConfig);
     }
 
-    const sessionFile = await sessionDebugger.createSessionFile(
+    const { script, dataFile, startline } = await sessionDebugger.createSessionFile(
       originalPath,
-      sessionId
+      sessionId,
+      requestData
     );
 
+    console.log(dataFile);
+    // open both file
+    // Open the data file if it is not null
+    if (dataFile) {
+      const document = await vscode.workspace.openTextDocument(dataFile);
+      await vscode.window.showTextDocument(document, { viewColumn: vscode.ViewColumn.One });
+    }
+
+    // Open the script file
+    const scriptDocument = await vscode.workspace.openTextDocument(script);
+    await vscode.window.showTextDocument(scriptDocument, { viewColumn: vscode.ViewColumn.Two });
+
     // Setting breakpoint
-    const debugFileUri = vscode.Uri.file(sessionFile);
+    const debugFileUri = vscode.Uri.file(script);
     const breakpoint = new vscode.SourceBreakpoint(
-      new vscode.Location(debugFileUri, new vscode.Position(0, 0))
+      new vscode.Location(debugFileUri, new vscode.Position(startline, 0))
     );
     vscode.debug.addBreakpoints([breakpoint]);
 
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(
-      vscode.Uri.file(sessionFile)
+      vscode.Uri.file(script)
     );
     vscode.debug.startDebugging(workspaceFolder, {
       type: "node",
       request: "launch",
       name: "Debug Modified JS",
-      program: sessionFile,
+      program: script,
       console: "integratedTerminal",
     });
   }
@@ -292,6 +308,5 @@ async function copyFilesToWorkspace(extensionPath, debuggerConfig) {
 }
 
 module.exports = {
-  DebugSessionsProvider,
-  copyFilesToWorkspace
+  DebugSessionsProvider
 };

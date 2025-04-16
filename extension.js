@@ -2,7 +2,7 @@
 const vscode = require("vscode");
 
 const {
-  copyFilesToWorkspace, DebugSessionsProvider,
+  DebugSessionsProvider,
 } = require("./assets/scripts/DebugSession.js");
 const {
   BlueprintSessionsProvider,
@@ -31,8 +31,16 @@ function activate(context) {
    */
   // debug command
   context.subscriptions.push(
-    vscode.commands.registerCommand("logik-debugger.startDebug", async () => {
-      provider.startDebug();
+    vscode.commands.registerCommand("logik-debugger.startDebug", async (item) => {
+      
+      // Check if this launched from call history
+      if (item && item.contextValue === 'callHistoryItem') {
+        const fields = item.fields;
+        console.log('Fields passed to startDebug:', fields);
+        provider.startDebug(item.sessionId, item.fields);
+      } else {
+        provider.startDebug();
+      }
     })
   );
 

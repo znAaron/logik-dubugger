@@ -46,7 +46,6 @@ class BlueprintSessionsProvider {
         new vscode.TreeItem("Rules", vscode.TreeItemCollapsibleState.Collapsed),
       ];
     } else if (element.label == "Fields") {
-      console.log(fieldsData);
       return fieldsData.map((field) => {
         const fieldItem = new FieldTreeItem(
           field.name,
@@ -92,6 +91,7 @@ class BlueprintSessionsProvider {
           fieldsData.push({
             type: row.field_type,
             name: row.name,
+            variableName: row.variableName,
             description: row.description,
           });
         })
@@ -170,6 +170,11 @@ class RuleTreeItem extends vscode.TreeItem {
   }
 }
 
+function getFields(){
+  return fieldsData;
+}
+
 module.exports = {
-  BlueprintSessionsProvider
+  BlueprintSessionsProvider,
+  getFields
 };

@@ -79,7 +79,7 @@ class ValidationDebugger {
     );
   }
 
-  async createSessionFile(filepath, sessionId) {
+  async createSessionFile(filepath, sessionId, data) {
     const allBOMResult = await this.sessionConnector.getDebugProducts(
       sessionId
     );
@@ -104,8 +104,9 @@ class ValidationDebugger {
     const combinedFilePath = path.join(
       FolderPath, "/validation_runner.js"
     );
-
-    console.log('combined path:', combinedFilePath);
+    const dataFilePath = path.join(
+      FolderPath, "/validation_data.js"
+    );
 
     if (!fs.existsSync(FolderPath)) {
       fs.mkdirSync(FolderPath, {
@@ -113,38 +114,41 @@ class ValidationDebugger {
       });
     }
 
+    const dataContnt = `let debugFields = ${prettyDebugFields};
+let debugProducts = ${prettyDebugProducts};
+
+module.exports = {
+    debugFields, debugProducts
+};
+  `;
     const modifiedValidationContent = validationContent
       .replace(/!== null/g, "!= null") // Replace all occurrences of !== null
       .split("\n") // Split into lines
       .map((line) => "  " + line) // Add 2 spaces to each line
       .join("\n"); // Join the lines back together
 
-    const combinedContent = `const { lookup } = require('../../.LGK_Scripts/lookup.js');
+    const combinedContent = `const { debugFields, debugProducts } = require('./validation_data.js');
+const { lookup } = require('../../.LGK_Scripts/lookup.js');
 const { LGK } = require('../../.LGK_Scripts/lgk.js');
 
-let debugFields = ${prettyDebugFields};
-let debugProducts = ${prettyDebugProducts};
-
-// Fetching Session Data
-let set = debugFields.set;
-let cfg = debugFields.cfg;
-let ProductList = debugProducts;
-
 function validation(set, cfg, ProductList) {
-
   // VALIDATION SCRIPT
 ${modifiedValidationContent}
-
 }
 
-let validation_message = validation(set, cfg, ProductList)
+let validation_message = validation(debugFields.set, debugFields.cfg, debugProducts)
 console.log(validation_message);
 `;
 
     // Write the combined content to a new file
     fs.writeFileSync(combinedFilePath, combinedContent);
+    fs.writeFileSync(dataFilePath, dataContnt);
 
-    return combinedFilePath;
+    return {
+      script: combinedFilePath,
+      dataFile: dataFilePath,
+      startline: 5
+    };
   }
 }
 
