@@ -2,19 +2,27 @@
 const vscode = require("vscode");
 
 const {
-  DebugSessionsProvider,
+  copyFilesToWorkspace, DebugSessionsProvider,
 } = require("./assets/scripts/DebugSession.js");
 const {
   BlueprintSessionsProvider,
 } = require("./assets/scripts/BlueprintView.js");
+const { startServer } = require("./assets/scripts/APIServer");
+const { ApiCallTreeView } = require("./assets/scripts/APIView");
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
   // provider classes
-  const provider = new DebugSessionsProvider(context.extensionUri);
+  const provider = new DebugSessionsProvider(context.extensionUri, context.extensionPath);
   const bpProvider = new BlueprintSessionsProvider();
+
+  // Initialize the API call tree view
+  const apiCallTreeView = new ApiCallTreeView();
+
+  // Start the API server
+  const apiServer = startServer(apiCallTreeView);
 
   /**
    * ===============================================================
@@ -38,6 +46,12 @@ function activate(context) {
     })
   );
 
+  // API endpoint to refresh the tree view
+  context.subscriptions.push(
+    vscode.commands.registerCommand("logik-debugger.refreshApiCallHistory", () => {
+      apiCallTreeView.refresh(apiServer.getHistory());
+    })
+  );
 
   /**
    * ===============================================================
@@ -53,9 +67,21 @@ function activate(context) {
   context.subscriptions.push(
     vscode.window.registerTreeDataProvider("blueprint", bpProvider)
   );
+
+  // Register the tree view provider for the API call history
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider("requestHistory", apiCallTreeView)
+  );
+
+  // Clean up the server on extension deactivate
+  context.subscriptions.push({
+    dispose: () => {
+      apiServer.close();
+    }
+  });
 }
 
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
   activate,

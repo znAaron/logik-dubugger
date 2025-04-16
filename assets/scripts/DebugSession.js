@@ -2,12 +2,14 @@ const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
+const { exec } = require("child_process");
 
 const { ValidationDebugger } = require("./debugger/validation_debugger.js");
 
 class DebugSessionsProvider {
-  constructor(_extensionUri) {
+  constructor(_extensionUri, extensionPath) {
     this._extensionUri = _extensionUri;
+    this.extensionPath = extensionPath;
     this.filenames = {};
 
     // Read the blueprint.yaml file
@@ -45,7 +47,7 @@ class DebugSessionsProvider {
     });
   }
 
-  startDebug(sessionId) {
+  startDebug(sessionId, requestData) {
     // Create an array of the file options
     const fileOptions = ["INIT", "PRODUCT", "REQUEST", "VALIDATION"];
 
@@ -64,8 +66,6 @@ class DebugSessionsProvider {
   }
 
   async handleDebugSession(type, fileName, sessionId) {
-    console.log(type);
-
     const selectedFile = fileName;
     if (!selectedFile) {
       vscode.window.showErrorMessage("Unable to find the script");
@@ -82,12 +82,18 @@ class DebugSessionsProvider {
     const origin = vscode.workspace
       .getConfiguration()
       .get("logikDebugger.origin");
+    const adminToken = vscode.workspace
+      .getConfiguration()
+      .get("logikDebugger.adminToken");
 
     const debuggerConfig = {
       logikUrl: url,
       runtimeToken: token,
       origin: origin,
+      adminToken: adminToken
     };
+
+    copyFilesToWorkspace(this.extensionPath, debuggerConfig);
 
     if (!token || !url) {
       vscode.window
@@ -238,6 +244,54 @@ async function readBlueprintYaml() {
   }
 }
 
+
+async function copyFilesToWorkspace(extensionPath, debuggerConfig) {
+  console.log('copy file');
+  const lgkfile = path.join(extensionPath, 'assets/localLGK/lgk.js');
+  const lookupfile = path.join(extensionPath, 'assets/localLGK/lookup.js');
+
+  const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath;
+  const targetFolder = path.join(workspaceFolder, '.LGK_Scripts')
+  if (!fs.existsSync(targetFolder)) {
+    exec("npm install sync-request", { cwd: workspaceFolder }, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error installing sync-request: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+    });
+
+    fs.mkdirSync(targetFolder, {
+      recursive: true,
+    });
+  }
+
+  const lgkdestinationFile = path.join(targetFolder, path.basename(lgkfile));
+  try {
+    await fs.promises.copyFile(lgkfile, lgkdestinationFile);
+    console.log(`Copied ${lgkfile} to workspace.`);
+  } catch (error) {
+    console.error(`Failed to copy ${lgkfile}:`, error);
+  }
+
+  const lookupdestinationFile = path.join(targetFolder, path.basename(lookupfile));
+  const lookupContent = fs.readFileSync(lookupfile, "utf-8");
+  const modifiedLookupContent = lookupContent
+    .replace(/#LOGIK_URL#/g, debuggerConfig.logikUrl)
+    .replace(/#ADMIN_TOKEN#/g, debuggerConfig.adminToken)
+  try {
+    await fs.writeFileSync(lookupdestinationFile, modifiedLookupContent);
+    console.log(`Copied ${lgkfile} to workspace.`);
+  } catch (error) {
+    console.error(`Failed to copy ${lgkfile}:`, error);
+  }
+}
+
 module.exports = {
   DebugSessionsProvider,
+  copyFilesToWorkspace
 };

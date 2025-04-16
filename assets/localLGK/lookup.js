@@ -1,5 +1,6 @@
 // lookup.mjs
-// replace #LOGIK_URL# and #RUNTIME_TOKEN#
+var request = require('sync-request');
+
 function lookup(query, params = {}) {
     const sab = new SharedArrayBuffer(4);
     const int32 = new Int32Array(sab);
@@ -17,9 +18,14 @@ function lookup(query, params = {}) {
 
     // Step 2: Call the API to get the entire table
     const url = `#LOGIK_URL#/api/managedTables/v2/managedTables/${tableName}`;
-    const token = "#RUNTIME_TOKEN#";
-
-    const response = syncRequest(url, token);
+    const token = "#ADMIN_TOKEN#";
+    
+    const response = request('GET', url, {
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        }
+    });
 
     if (response.statusCode !== 200) {
         throw new Error("Failed to fetch data from API");
@@ -73,45 +79,6 @@ function lookup(query, params = {}) {
     return filteredResults;
 }
 
-function syncRequest(url, token) {
-    const sab = new SharedArrayBuffer(4);
-    const int32 = new Int32Array(sab);
-    let responseText;
-    let error;
-
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        }
-    })
-    .then(res => {
-        if (!res.ok) {
-            throw new Error(`HTTP error ${res.status}`);
-        }
-        return res.text();
-    })
-    .then(data => {
-        responseText = data;
-    })
-    .catch(err => {
-        error = err;
-    })
-    .finally(() => {
-        Atomics.store(int32, 0, 1); // unblock
-        Atomics.notify(int32, 0);
-    });
-
-    // Block here until Atomics.notify is called
-    Atomics.wait(int32, 0, 0);
-
-    if (error) {
-        throw error;
-    }
-
-    return responseText;
-}
-
-// Export the function
-export default lookup;
+module.exports = {
+    lookup
+};

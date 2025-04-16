@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const {
-  sessionConnector,
+  SessionConnector,
 } = require("./sessionConnector.js");
 
 function parseConfig(responseBody) {
@@ -72,7 +72,7 @@ class ValidationDebugger {
   constructor(sessionId, config) {
     this.sessionId = sessionId;
     this.config = config;
-    this.sessionConnector = new sessionConnector(
+    this.sessionConnector = new SessionConnector(
       config.logikUrl,
       config.runtimeToken,
       config.origin
@@ -119,8 +119,8 @@ class ValidationDebugger {
       .map((line) => "  " + line) // Add 2 spaces to each line
       .join("\n"); // Join the lines back together
 
-    const combinedContent = `import lookup from '../../.LGK_Scripts/lookup.mjs';
-import LGK from '../../.LGK_Scripts/lgk.mjs';
+    const combinedContent = `const { lookup } = require('../../.LGK_Scripts/lookup.js');
+const { LGK } = require('../../.LGK_Scripts/lgk.js');
 
 let debugFields = ${prettyDebugFields};
 let debugProducts = ${prettyDebugProducts};

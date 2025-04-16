@@ -15,7 +15,8 @@
     "commands": [
       {
         "command": "logik-debugger.startDebug",
-        "title": "Logik Debugger: start debug"
+        "title": "Logik Debugger: start debug",
+        "icon":  "assets/icon/start.svg"
       },
       {
         "command": "logik-debugger.configure",
@@ -40,13 +41,22 @@
         },
         {
           "type": "tree",
-          "id": "configView",
-          "name": "Current Config"
+          "id": "requestHistory",
+          "name": "Request History"
         },
         {
           "type": "tree",
           "id": "blueprint",
           "name": "Current Blueprint"
+        }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "logik-debugger.startDebug",
+          "when": "view == requestHistory && viewItem == callHistoryItem",
+          "group": "inline"
         }
       ]
     },
@@ -63,6 +73,11 @@
           "type": "string",
           "default": "",
           "description": "Logik Runtime Client Token"
+        },
+        "logikDebugger.adminToken": {
+          "type": "string",
+          "default": "",
+          "description": "Logik Admin Token"
         },
         "logikDebugger.origin": {
           "type": "string",
@@ -86,7 +101,10 @@
     "eslint": "^9.23.0"
   },
   "dependencies": {
+    "axios": "^1.8.4",
+    "body-parser": "^2.2.0",
     "csv-parser": "^3.2.0",
+    "express": "^5.1.0",
     "js-yaml": "^4.1.0"
   }
 }

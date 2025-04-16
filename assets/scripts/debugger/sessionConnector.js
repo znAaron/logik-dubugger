@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 
-class sessionConnector {
+class SessionConnector {
   constructor(logikUrl, runtimeToken, origin) {
     this.logikUrl = logikUrl;
     this.runtimeToken = runtimeToken;
@@ -66,5 +66,5 @@ class sessionConnector {
 }
 
 module.exports = {
-  sessionConnector,
+  SessionConnector,
 };

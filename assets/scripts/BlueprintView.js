@@ -16,8 +16,6 @@ class BlueprintSessionsProvider {
   }
 
   refresh() {
-    // This function can be used to refresh the tree view
-    console.log("fresh view");
     this._onDidChangeTreeData.fire();
   }
 

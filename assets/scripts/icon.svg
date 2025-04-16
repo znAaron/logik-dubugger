@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="none"/>
+  <!-- Main Letter 'L' -->
+  <text x="2" y="28" font-family="Segoe UI, sans-serif" font-size="28" font-weight="bold" fill="currentColor">L</text>
+  <!-- Simulated extra-bold '<>' using stroke -->
+  <text x="12" y="15"
+        font-family="Consolas, Courier New, monospace"
+        font-size="17"
+        font-weight="bold"
+        fill="currentColor"
+        stroke="currentColor"
+        stroke-width="0.8">
+    &lt;&gt;
+  </text>
+</svg>

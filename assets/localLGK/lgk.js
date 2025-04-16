@@ -22,4 +22,6 @@ const LGK = {
 };
 
 // Export the LGK object
-export default LGK;
+module.exports = {
+    LGK
+};
